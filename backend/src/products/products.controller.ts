@@ -1,8 +1,9 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 
 @ApiTags('products')
 @Controller('products')
@@ -43,10 +44,13 @@ export class ProductsController {
   }
 
   @Delete(':id')
+  @UseGuards(JwtAuthGuard)
   @ApiOperation({summary: 'Eliminar un producto'})
+  @ApiBearerAuth()
   @ApiParam({name: 'id', description: 'UUID del producto'})
   @ApiResponse({status: 200, description: 'Producto eliminado con exito'})
   @ApiResponse({status: 404, description: 'Producto no encontrado'})
+  @ApiResponse({status: 401, description: 'No autorizado'})
   remove(@Param('id') id: string) {
     return this.productsService.remove(id);
   }
