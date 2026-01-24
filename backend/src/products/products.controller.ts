@@ -12,7 +12,7 @@ export class ProductsController {
   @Post()
   @ApiOperation({summary: 'Crear un nuevo producto'})
   @ApiResponse({status: 201, description: 'Producto creado con exito'})
-  @ApiResponse({status: 400, description: 'Ingreso invalido'})
+  @ApiResponse({status: 400, description: 'Informacion invalida'})
   create(@Body() createProductDto: CreateProductDto) {
     return this.productsService.create(createProductDto);
   }
