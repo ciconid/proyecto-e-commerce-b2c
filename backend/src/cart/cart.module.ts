@@ -6,6 +6,7 @@ import { AuthModule } from 'src/auth/auth.module';
 @Module({
   controllers: [CartController],
   providers: [CartService],
-  imports: [AuthModule]
+  imports: [AuthModule],
+  exports: [CartService]
 })
 export class CartModule {}
