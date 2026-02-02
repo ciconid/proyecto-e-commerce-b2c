@@ -36,10 +36,8 @@ function LoginPage() {
                 message: error.response?.data?.message || "Error al iniciar sesión",
                 title: "Error",
                 color: "red",
-            });
-            
+            });   
         }
-
     };
 
 
@@ -72,7 +70,7 @@ function LoginPage() {
                                 error={errors.password?.message}
                             />
 
-                            <Button type="submit"fullWidth loading={isSubmitting}>
+                            <Button type="submit" fullWidth loading={isSubmitting}>
                                 Iniciar sesión
                             </Button>
                         </Stack>
