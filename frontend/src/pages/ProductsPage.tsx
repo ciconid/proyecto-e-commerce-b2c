@@ -1,41 +1,58 @@
-import { useAuth } from "../hooks/useAuth";
-import { useAuthStore } from "../store/authStore";
+import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader } from "@mantine/core";
+import { useProducts } from "../hooks/useProducts";
+
 
 function ProductsPage() {
-    const { user, isAuthenticated, isAdmin } = useAuth();
-    const { setAuth, clearAuth} = useAuthStore();
+    const { data: products, error, isLoading } = useProducts();
 
-    const handleFakeLogin = () => {
-        const fakeUser = {
-            id: '1',
-            email: 'test@example.com',
-            name: 'Usuario Test',
-            role: 'user' as const,
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-        };
+    if (isLoading){
+        return(
+            <Center style={{ minHeight: "100vh" }}>
+                <Loader size={"xl"}></Loader>
+            </Center>
+        );
+    }
 
-        setAuth(fakeUser, 'fake-at', 'fake-rt');
-    };
-
-
+    if (error) {
+        return(
+            <Container>
+                <Text c={"red"}>Error al cargar productos</Text>
+            </Container>
+        );
+    }
 
     return (
-        <div style={{ padding: '20px' }}>
-        <h1>Products Page</h1>
-        
-        <div style={{ marginTop: '20px', padding: '20px', border: '1px solid #ccc' }}>
-            <h3>Estado de Auth:</h3>
-            <p>Autenticado: {isAuthenticated ? '✅ Sí' : '❌ No'}</p>
-            <p>Es Admin: {isAdmin ? '✅ Sí' : '❌ No'}</p>
-            {user && <p>Usuario: {user.name} ({user.email})</p>}
-            
-            <div style={{ marginTop: '10px' }}>
-            <button onClick={handleFakeLogin}>Fake Login</button>
-            <button onClick={clearAuth} style={{ marginLeft: '10px' }}>Logout</button>
-            </div>
-        </div>
-        </div>
+        <Container size={"xl"}>
+            <Title mb={"xl"}>Productos</Title>
+
+            <Grid>
+                <SimpleGrid cols={{base: 1, sm: 2, md: 3, lg: 4}} spacing={"md"}>
+                    {
+                        products?.map((product) => (
+                            <Card 
+                                withBorder
+                                key={product.id} 
+                                h="100%"
+                                style={{ display: "flex", flexDirection: "column" }}
+                            >
+
+                                <Image 
+                                    src={product.imageUrl || "https://www.nomadfoods.com/wp-content/uploads/2018/08/placeholder-1-e1533569576673.png"}
+                                    height={200}    
+                                />
+
+                                <Title order={3} mt={"md"}>{product.name}</Title>
+                                <Text size="sm" c={"dimmed"}>{product.description}</Text>
+                                <Text size="xl" fw={700} mt={"md"}>${product.price}</Text>
+                                <Text size="sm">Stock: {product.stock}</Text>
+
+                                <Button fullWidth mt="auto">Agregar al carrito</Button>
+                            </Card>        
+                        ))
+                    } 
+                </SimpleGrid>
+            </Grid>
+        </Container>
     );
 }
 
