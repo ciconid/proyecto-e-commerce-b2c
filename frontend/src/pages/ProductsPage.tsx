@@ -1,9 +1,15 @@
 import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader } from "@mantine/core";
 import { useProducts } from "../hooks/useProducts";
+import { useCart } from "../hooks/useCart";
 
 
 function ProductsPage() {
     const { data: products, error, isLoading } = useProducts();
+    const { addItem } = useCart();
+
+    const handleAddToCart = (productId: string) => {
+        addItem({productId, quantity: 1});
+    };
 
     if (isLoading){
         return(
@@ -46,7 +52,14 @@ function ProductsPage() {
                                 <Text size="xl" fw={700} mt={"md"}>${product.price}</Text>
                                 <Text size="sm">Stock: {product.stock}</Text>
 
-                                <Button fullWidth mt="auto">Agregar al carrito</Button>
+                                <Button 
+                                    fullWidth 
+                                    mt="auto"
+                                    onClick={() => handleAddToCart(product.id)}
+                                    disabled={product.stock === 0}
+                                >
+                                    {product.stock === 0 ? "Sin stock" : "Agregar al carrito"}
+                                </Button>
                             </Card>        
                         ))
                     } 
