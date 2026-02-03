@@ -6,11 +6,14 @@ import CartPage from "./pages/CartPage"
 import OrdersPage from "./pages/OrdersPage"
 import AdminPage from "./pages/AdminPage"
 import NotFoundPage from "./pages/NotFoundPage"
+import Navbar from "./components/Navbar"
 
 function App() {
 
     return (
         <BrowserRouter>
+            <Navbar />
+
             <Routes>
                 {/* Rutas publicas */}
                 <Route path="/login" element={<LoginPage />} />
