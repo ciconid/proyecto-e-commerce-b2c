@@ -39,7 +39,7 @@ function Navbar() {
                         Carrito
                         {totalItems > 0 &&
                             <Badge
-                                size="xs"
+                                size="md"
                                 circle
                                 color="red"
                                 style={{
