@@ -1,12 +1,14 @@
-import { ActionIcon, Anchor, Box, Group, Text } from "@mantine/core";
+import { ActionIcon, Anchor, Badge, Box, Group, Text } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { IconLogout } from "@tabler/icons-react"
 import { useAuthStore } from "../store/authStore";
+import { useCartStore } from "../store/cartStore";
 
 
 function Navbar() {
     const navigate = useNavigate();
     const clearAuth = useAuthStore((state) => state.clearAuth);
+    const totalItems = useCartStore((state) => state.getTotalItems());
 
     const handleLogout = () => {
         clearAuth();
@@ -31,6 +33,24 @@ function Navbar() {
                 <Group>
                     <Anchor component={Link} to={"/products"}>
                         Productos
+                    </Anchor>
+
+                    <Anchor component={Link} to={"/cart"} style={{ position: "relative" }}>
+                        Carrito
+                        {totalItems > 0 &&
+                            <Badge
+                                size="xs"
+                                circle
+                                color="red"
+                                style={{
+                                    position: "absolute",
+                                    top: -8,
+                                    right: -12
+                                }}
+                            >
+                                {totalItems}
+                            </Badge>
+                        }
                     </Anchor>
 
                     <ActionIcon onClick={handleLogout}>
