@@ -53,6 +53,10 @@ function Navbar() {
                         }
                     </Anchor>
 
+                    <Anchor component={Link} to={"/orders"}>
+                        Mis Órdenes
+                    </Anchor>
+
                     <ActionIcon onClick={handleLogout}>
                         <IconLogout />
                     </ActionIcon>

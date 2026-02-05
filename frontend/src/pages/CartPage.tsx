@@ -1,9 +1,11 @@
 import { Box, Button, Card, Center, Container, Group, Image, Loader, Text, Title } from "@mantine/core";
 import { useCart } from "../hooks/useCart";
 import { Link } from "react-router-dom";
+import { useOrders } from "../hooks/useOrders";
 
 function CartPage() {
     const { cart, isLoading, error, addItem, updateItem, removeItem } = useCart();
+    const { createOrder, isCreatingOrder } = useOrders();
 
     if (isLoading) {
         return (
@@ -25,13 +27,15 @@ function CartPage() {
 
     if (!cart || cart.items.length === 0) {
         return (
-            <Container>
-                <Title>Mi Carrito</Title>
-                <Text mt="md">Tu carrito está vacío</Text>
-                <Button component={Link} to="/products" mt="md">
-                    Ver productos
-                </Button>
-            </Container>
+            <Box style={{ width: "100vw", height: "100vh" }}>
+                <Container>
+                    <Title>Mi Carrito</Title>
+                    <Text mt="md">Tu carrito está vacío</Text>
+                    <Button component={Link} to="/products" mt="md">
+                        Ver productos
+                    </Button>
+                </Container>
+            </Box>
         );
     }
 
@@ -100,7 +104,13 @@ function CartPage() {
                         <Text size="xl" fw={700}>${total}</Text>
                     </Group>
 
-                    <Button fullWidth mt="md" size="lg">
+                    <Button
+                        fullWidth
+                        mt="md"
+                        size="lg"
+                        loading={isCreatingOrder}
+                        onClick={() => createOrder()}
+                    >
                         Finalizar compra
                     </Button>
                 </Card>
