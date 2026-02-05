@@ -43,6 +43,7 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
+            console.log("401 && !retry");
             
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
@@ -66,7 +67,7 @@ axiosInstance.interceptors.response.use(
                 }
 
                 const response = await axios.post(
-                    `${axiosInstance.defaults.baseURL}/auth/refesh`,
+                    `${axiosInstance.defaults.baseURL}/auth/refresh`,
                     { refresh_token: refreshToken }
                 );
 
