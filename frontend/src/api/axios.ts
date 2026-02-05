@@ -43,7 +43,6 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
-            console.log("401 && !retry");
             
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
