@@ -6,14 +6,17 @@ import type z from 'zod';
 import { createProductSchema } from '../utils/validations';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
+import type { Product } from '../types/product.types';
 
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
 function AdminPage() {
     const { data: products, isLoading } = useProducts();
-    const { deleteProduct, createProduct, isCreating } = useAdminProducts();
+    const { deleteProduct, createProduct, isCreating, updateProduct, isUpdating } = useAdminProducts();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
 
     const { register, handleSubmit, formState: { errors }, reset, control } = useForm<CreateProductForm>({
         resolver: zodResolver(createProductSchema),
@@ -25,6 +28,62 @@ function AdminPage() {
                 setIsCreateModalOpen(false);
                 reset();
             },
+        });
+    };
+
+    const onEditProduct = (data: CreateProductForm) => {
+        if (!selectedProduct) return;
+
+        updateProduct(
+            { id: selectedProduct.id, data },
+            {
+                onSuccess: () => {
+                    setIsEditModalOpen(false);
+                    setSelectedProduct(null);
+                    reset();
+                },
+            }
+        );
+    };
+
+    const handleEditClick = (product: Product) => {
+        setSelectedProduct(product);
+        reset({
+            name: product.name,
+            description: product.description || '',
+            price: product.price,
+            stock: product.stock,
+            imageUrl: product.imageUrl || '',
+        });
+        setIsEditModalOpen(true);
+    };
+
+    const handleCloseEditModal = () => {
+        setIsEditModalOpen(false);
+        setSelectedProduct(null);
+        reset();
+    };
+
+    const modalStyles = {
+        inner: {
+            justifyContent: 'flex-start',
+        },
+        content: {
+            margin: -300,
+            width: '50vw',
+            maxWidth: '50vw',
+            height: '100vh',
+            borderRadius: 0,
+        },
+    };
+
+    const resetModal = () => {
+        reset({
+            name: "",
+            description: "",
+            //price: 0,
+            //stock: 0,
+            imageUrl: "",
         });
     };
 
@@ -41,7 +100,10 @@ function AdminPage() {
                 <Tabs.Panel value="products" pt="xl">
                     <Group justify="space-between" mb="md">
                         <Title order={2}>Gestión de Productos</Title>
-                        <Button onClick={() => setIsCreateModalOpen(true)}>
+                        <Button onClick={() => {
+                            resetModal();
+                            setIsCreateModalOpen(true)
+                        }}>
                             Crear Producto
                         </Button>
                     </Group>
@@ -66,7 +128,13 @@ function AdminPage() {
                                         <Table.Td>{product.stock}</Table.Td>
                                         <Table.Td>
                                             <Group gap="xs">
-                                                <Button size="xs" variant="light">Editar</Button>
+                                                <Button
+                                                    size="xs"
+                                                    variant="light"
+                                                    onClick={() => handleEditClick(product)}
+                                                >
+                                                    Editar
+                                                </Button>
                                                 <Button
                                                     size="xs"
                                                     color="red"
@@ -96,20 +164,7 @@ function AdminPage() {
                 title="Crear Nuevo Producto"
                 size="lg"
                 centered
-                styles={{
-                    inner: {
-                        justifyContent: 'flex-start', 
-                    },
-                    content: {
-                        margin: -300, // hardcodeado hasta encontrar solucion de posicion del Modal
-                        width: '50vw',       
-                        maxWidth: '50vw',
-                        height: '100vh',
-                        borderRadius: 0,
-                    },
-                }}
-
-
+                styles={modalStyles}
             >
                 <form onSubmit={handleSubmit(onCreateProduct)}>
                     <Stack>
@@ -165,6 +220,74 @@ function AdminPage() {
 
                         <Button type="submit" fullWidth loading={isCreating}>
                             Crear Producto
+                        </Button>
+                    </Stack>
+                </form>
+            </Modal>
+
+            {/* Modal Editar Producto */}
+            <Modal
+                opened={isEditModalOpen}
+                onClose={handleCloseEditModal}
+                title="Editar Producto"
+                size="lg"
+                centered
+                styles={modalStyles}
+            >
+                <form onSubmit={handleSubmit(onEditProduct)}>
+                    <Stack>
+                        <TextInput
+                            label="Nombre"
+                            placeholder="Nombre del producto"
+                            {...register('name')}
+                            error={errors.name?.message}
+                        />
+
+                        <Textarea
+                            label="Descripción"
+                            placeholder="Descripción del producto"
+                            {...register('description')}
+                            error={errors.description?.message}
+                        />
+
+                        <Controller
+                            name="price"
+                            control={control}
+                            render={({ field }) => (
+                                <NumberInput
+                                    {...field}
+                                    label="Precio"
+                                    placeholder="0.00"
+                                    min={0}
+                                    decimalScale={2}
+                                    error={errors.price?.message}
+                                />
+                            )}
+                        />
+
+                        <Controller
+                            name="stock"
+                            control={control}
+                            render={({ field }) => (
+                                <NumberInput
+                                    {...field}
+                                    label="Stock"
+                                    placeholder="0"
+                                    min={0}
+                                    error={errors.stock?.message}
+                                />
+                            )}
+                        />
+
+                        <TextInput
+                            label="URL de Imagen"
+                            placeholder="https://ejemplo.com/imagen.jpg"
+                            {...register('imageUrl')}
+                            error={errors.imageUrl?.message}
+                        />
+
+                        <Button type="submit" fullWidth loading={isUpdating}>
+                            Actualizar Producto
                         </Button>
                     </Stack>
                 </form>
