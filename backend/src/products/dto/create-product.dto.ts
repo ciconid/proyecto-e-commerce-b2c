@@ -14,7 +14,7 @@ export const CreateProductSchema = z.object({
     stock: z.number()
         .int('El stock debe ser un numero entero')
         .min(0, 'El stock no puede ser negativo'),
-    imagerUrl: urlSchema
+    imageUrl: urlSchema
         .optional()
     
 
