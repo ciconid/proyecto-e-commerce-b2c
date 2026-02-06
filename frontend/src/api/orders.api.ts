@@ -15,7 +15,11 @@ export const ordersApi = {
     getOrderById: async (id: string): Promise<Order> => {
         const response = await axiosInstance.get<Order>(`/orders/${id}`);
         return response.data;
-    }
+    },
     
+    updateOrderStatus: async (id: string, status: string): Promise<Order> => {
+        const response = await axiosInstance.patch<Order>(`/orders/${id}/status`, {status});
+        return response.data;
+    }
 
 };

@@ -1,4 +1,4 @@
-import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea } from '@mantine/core';
+import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select } from '@mantine/core';
 import { useProducts } from '../hooks/useProducts';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useState } from 'react';
@@ -7,12 +7,17 @@ import { createProductSchema } from '../utils/validations';
 import { useForm, Controller } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import type { Product } from '../types/product.types';
+import { useOrders } from '../hooks/useOrders';
+import { useAdminOrders } from '../hooks/useAdminOrders';
 
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
 function AdminPage() {
     const { data: products, isLoading } = useProducts();
     const { deleteProduct, createProduct, isCreating, updateProduct, isUpdating } = useAdminProducts();
+
+    const { orders: allOrders, isLoading: ordersLoading } = useOrders();
+    const { updateOrderStatus } = useAdminOrders();
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -154,7 +159,49 @@ function AdminPage() {
 
                 <Tabs.Panel value="orders" pt="xl">
                     <Title order={2} mb="md">Todas las Órdenes</Title>
-                    {/* Aquí va la tabla de órdenes */}
+                        {ordersLoading ? (
+                            <Loader />
+                        ) : (
+                            <Table>
+                                <Table.Thead>
+                                    <Table.Tr>
+                                        <Table.Th>ID</Table.Th>
+                                        <Table.Th>Usuario</Table.Th>
+                                        <Table.Th>Total</Table.Th>
+                                        <Table.Th>Estado</Table.Th>
+                                        <Table.Th>Fecha</Table.Th>
+                                        <Table.Th>Acciones</Table.Th>
+                                    </Table.Tr>
+                                </Table.Thead>
+                                <Table.Tbody>
+                                    {allOrders?.map((order) => (
+                                        <Table.Tr key={order.id}>
+                                            <Table.Td>{order.id.substring(0, 8)}...</Table.Td>
+                                            <Table.Td>{order.userId.substring(0, 8)}...</Table.Td>
+                                            <Table.Td>${order.total}</Table.Td>
+                                            <Table.Td>
+                                                <Select
+                                                    value={order.status}
+                                                    onChange={(value) => value && updateOrderStatus({ id: order.id, status: value })}
+                                                    data={[
+                                                        { value: 'pendiente', label: 'Pendiente' },
+                                                        { value: 'completada', label: 'Completada' },
+                                                        { value: 'cancelada', label: 'Cancelada' },
+                                                    ]}
+                                                    size="xs"
+                                                />
+                                            </Table.Td>
+                                            <Table.Td>{new Date(order.createdAt).toLocaleDateString()}</Table.Td>
+                                            <Table.Td>
+                                                <Button size="xs" variant="light">Ver Detalle</Button>
+                                            </Table.Td>
+                                        </Table.Tr>
+                                    ))}
+                                </Table.Tbody>
+                            </Table>
+                        )}
+
+
                 </Tabs.Panel>
             </Tabs>
 
