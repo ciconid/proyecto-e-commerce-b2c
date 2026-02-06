@@ -9,6 +9,7 @@ function Navbar() {
     const navigate = useNavigate();
     const clearAuth = useAuthStore((state) => state.clearAuth);
     const totalItems = useCartStore((state) => state.getTotalItems());
+    const user = useAuthStore((state) => state.user);
 
     const handleLogout = () => {
         clearAuth();
@@ -16,11 +17,11 @@ function Navbar() {
     };
 
 
-    return(
-        <Box 
-            p={"md"} 
-            style={{ 
-                borderBottom: "1px solid #dee2e6", 
+    return (
+        <Box
+            p={"md"}
+            style={{
+                borderBottom: "1px solid #dee2e6",
                 position: "sticky",
                 top: 0,
                 backgroundColor: "white",
@@ -29,7 +30,7 @@ function Navbar() {
         >
             <Group justify="space-between">
                 <Text size="xl" fw={700} c={"blue"}>Mi tienda</Text>
-                
+
                 <Group>
                     <Anchor component={Link} to={"/products"}>
                         Productos
@@ -57,11 +58,18 @@ function Navbar() {
                         Mis Órdenes
                     </Anchor>
 
+                    {user?.role === "admin" &&
+                        <Anchor component={Link} to={"/admin"}>
+                            Admin Panel
+                        </Anchor>
+                    }
+
+
                     <ActionIcon onClick={handleLogout}>
                         <IconLogout />
                     </ActionIcon>
                 </Group>
-                
+
             </Group>
         </Box>
     );

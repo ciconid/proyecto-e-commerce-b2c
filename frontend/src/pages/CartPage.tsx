@@ -4,7 +4,7 @@ import { Link } from "react-router-dom";
 import { useOrders } from "../hooks/useOrders";
 
 function CartPage() {
-    const { cart, isLoading, error, addItem, updateItem, removeItem } = useCart();
+    const { cart, isLoading, error, updateItem, removeItem } = useCart();
     const { createOrder, isCreatingOrder } = useOrders();
 
     if (isLoading) {
