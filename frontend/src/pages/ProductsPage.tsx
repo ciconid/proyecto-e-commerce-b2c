@@ -1,4 +1,4 @@
-import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader, Box } from "@mantine/core";
+import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader } from "@mantine/core";
 import { useProducts } from "../hooks/useProducts";
 import { useCart } from "../hooks/useCart";
 

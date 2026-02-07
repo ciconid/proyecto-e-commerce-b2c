@@ -1,4 +1,4 @@
-import { Box, Button, Card, Center, Collapse, Container, Group, Loader, Text, Title } from "@mantine/core";
+import { Button, Card, Center, Collapse, Container, Group, Loader, Text, Title } from "@mantine/core";
 import { useOrders } from "../hooks/useOrders";
 import { Link } from "react-router-dom";
 import { useState } from "react";
