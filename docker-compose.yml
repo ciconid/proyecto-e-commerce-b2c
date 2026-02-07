@@ -35,6 +35,24 @@ services:
         condition: service_healthy
     command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: ecommerce-frontend
+    restart: always
+    ports:
+      - "5173:5173" 
+    depends_on:
+      - backend
+    environment:
+      - VITE_API_URL=http://localhost:3000/
+    networks:
+      - ecommerce-network
+  
+networks:
+  ecommerce-network:
+    driver: bridge
 
 volumes:
   postgres_data:
