@@ -1,0 +1,5 @@
+services:
+
+  frontend:
+      environment:
+        - VITE_API_URL=http://136.248.247.61:3000/
