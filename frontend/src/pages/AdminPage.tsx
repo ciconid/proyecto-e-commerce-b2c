@@ -29,7 +29,6 @@ function AdminPage() {
     });
 
     const onCreateProduct = (data: CreateProductForm) => {
-        console.log('📤 Datos a enviar:', data);
         createProduct(data, {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
@@ -269,7 +268,6 @@ function AdminPage() {
                                 <ImageUpload
                                     value={field.value || ''}
                                     onChange={(url) => {
-                                        console.log('🖼️ ImageURL recibida:', url);
                                         field.onChange(url);
                                     }}
                                     onUpload={uploadImage}

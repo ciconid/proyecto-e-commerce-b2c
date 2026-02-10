@@ -37,17 +37,12 @@ export const ImageUpload = ({ value, onChange, onUpload, isUploading }: ImageUpl
             reader.readAsDataURL(file);
 
             // Subir a Cloudinary
-            console.log('📤 Subiendo archivo a Cloudinary...');
             const result = await onUpload(file);
-            console.log('✅ Resultado de Cloudinary:', result);
 
             // El resultado puede ser string directo o { imageUrl: string }
             const imageUrl = typeof result === 'string' ? result : result.imageUrl;
 
-            console.log('🔗 imageUrl extraída:', imageUrl);
-            console.log('🎯 Llamando onChange con:', imageUrl);
             onChange(imageUrl);
-            console.log('✅ onChange ejecutado');
         } catch (error) {
             console.error('Error uploading image:', error);
             setPreview(null);
