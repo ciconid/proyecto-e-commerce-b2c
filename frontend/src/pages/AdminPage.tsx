@@ -9,12 +9,13 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import type { Product } from '../types/product.types';
 import { useOrders } from '../hooks/useOrders';
 import { useAdminOrders } from '../hooks/useAdminOrders';
+import { ImageUpload } from '../components/ImageUpload';
 
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
 function AdminPage() {
     const { data: products, isLoading } = useProducts();
-    const { deleteProduct, createProduct, isCreating, updateProduct, isUpdating } = useAdminProducts();
+    const { deleteProduct, createProduct, isCreating, updateProduct, isUpdating, uploadImage, isUploading } = useAdminProducts();
 
     const { orders: allOrders, isLoading: ordersLoading } = useOrders();
     const { updateOrderStatus } = useAdminOrders();
@@ -28,6 +29,7 @@ function AdminPage() {
     });
 
     const onCreateProduct = (data: CreateProductForm) => {
+        console.log('📤 Datos a enviar:', data);
         createProduct(data, {
             onSuccess: () => {
                 setIsCreateModalOpen(false);
@@ -159,52 +161,53 @@ function AdminPage() {
 
                 <Tabs.Panel value="orders" pt="xl">
                     <Title order={2} mb="md">Todas las Órdenes</Title>
-                        {ordersLoading ? (
-                            <Loader />
-                        ) : (
-                            <Table>
-                                <Table.Thead>
-                                    <Table.Tr>
-                                        <Table.Th>ID</Table.Th>
-                                        <Table.Th>Usuario</Table.Th>
-                                        <Table.Th>Total</Table.Th>
-                                        <Table.Th>Estado</Table.Th>
-                                        <Table.Th>Fecha</Table.Th>
-                                        <Table.Th>Acciones</Table.Th>
+                    {ordersLoading ? (
+                        <Loader />
+                    ) : (
+                        <Table>
+                            <Table.Thead>
+                                <Table.Tr>
+                                    <Table.Th>ID</Table.Th>
+                                    <Table.Th>Usuario</Table.Th>
+                                    <Table.Th>Total</Table.Th>
+                                    <Table.Th>Estado</Table.Th>
+                                    <Table.Th>Fecha</Table.Th>
+                                    <Table.Th>Acciones</Table.Th>
+                                </Table.Tr>
+                            </Table.Thead>
+                            <Table.Tbody>
+                                {allOrders?.map((order) => (
+                                    <Table.Tr key={order.id}>
+                                        <Table.Td>{order.id.substring(0, 8)}...</Table.Td>
+                                        <Table.Td>{order.userId.substring(0, 8)}...</Table.Td>
+                                        <Table.Td>${order.total}</Table.Td>
+                                        <Table.Td>
+                                            <Select
+                                                value={order.status}
+                                                onChange={(value) => value && updateOrderStatus({ id: order.id, status: value })}
+                                                data={[
+                                                    { value: 'pendiente', label: 'Pendiente' },
+                                                    { value: 'completada', label: 'Completada' },
+                                                    { value: 'cancelada', label: 'Cancelada' },
+                                                ]}
+                                                size="xs"
+                                            />
+                                        </Table.Td>
+                                        <Table.Td>{new Date(order.createdAt).toLocaleDateString()}</Table.Td>
+                                        <Table.Td>
+                                            <Button size="xs" variant="light">Ver Detalle</Button>
+                                        </Table.Td>
                                     </Table.Tr>
-                                </Table.Thead>
-                                <Table.Tbody>
-                                    {allOrders?.map((order) => (
-                                        <Table.Tr key={order.id}>
-                                            <Table.Td>{order.id.substring(0, 8)}...</Table.Td>
-                                            <Table.Td>{order.userId.substring(0, 8)}...</Table.Td>
-                                            <Table.Td>${order.total}</Table.Td>
-                                            <Table.Td>
-                                                <Select
-                                                    value={order.status}
-                                                    onChange={(value) => value && updateOrderStatus({ id: order.id, status: value })}
-                                                    data={[
-                                                        { value: 'pendiente', label: 'Pendiente' },
-                                                        { value: 'completada', label: 'Completada' },
-                                                        { value: 'cancelada', label: 'Cancelada' },
-                                                    ]}
-                                                    size="xs"
-                                                />
-                                            </Table.Td>
-                                            <Table.Td>{new Date(order.createdAt).toLocaleDateString()}</Table.Td>
-                                            <Table.Td>
-                                                <Button size="xs" variant="light">Ver Detalle</Button>
-                                            </Table.Td>
-                                        </Table.Tr>
-                                    ))}
-                                </Table.Tbody>
-                            </Table>
-                        )}
+                                ))}
+                            </Table.Tbody>
+                        </Table>
+                    )}
 
 
                 </Tabs.Panel>
             </Tabs>
 
+            {/* Modal Crear Producto */}
             <Modal
                 opened={isCreateModalOpen}
                 onClose={() => setIsCreateModalOpen(false)}
@@ -258,11 +261,21 @@ function AdminPage() {
                             )}
                         />
 
-                        <TextInput
-                            label="URL de Imagen"
-                            placeholder="https://ejemplo.com/imagen.jpg"
-                            {...register('imageUrl')}
-                            error={errors.imageUrl?.message}
+                        <Controller
+                            name="imageUrl"
+                            control={control}
+                            defaultValue=""
+                            render={({ field }) => (
+                                <ImageUpload
+                                    value={field.value || ''}
+                                    onChange={(url) => {
+                                        console.log('🖼️ ImageURL recibida:', url);
+                                        field.onChange(url);
+                                    }}
+                                    onUpload={uploadImage}
+                                    isUploading={isUploading}
+                                />
+                            )}
                         />
 
                         <Button type="submit" fullWidth loading={isCreating}>
@@ -326,11 +339,17 @@ function AdminPage() {
                             )}
                         />
 
-                        <TextInput
-                            label="URL de Imagen"
-                            placeholder="https://ejemplo.com/imagen.jpg"
-                            {...register('imageUrl')}
-                            error={errors.imageUrl?.message}
+                        <Controller
+                            name="imageUrl"
+                            control={control}
+                            render={({ field }) => (
+                                <ImageUpload
+                                    value={field.value}
+                                    onChange={field.onChange}
+                                    onUpload={uploadImage}
+                                    isUploading={isUploading}
+                                />
+                            )}
                         />
 
                         <Button type="submit" fullWidth loading={isUpdating}>

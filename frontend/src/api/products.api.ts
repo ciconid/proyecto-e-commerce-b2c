@@ -20,5 +20,22 @@ export const productsApi = {
 
     delete: async (id: string): Promise<void> => {
         await axiosInstance.delete(`/products/${id}`);
+    },
+
+    uploadImage: async (file: File): Promise<{ imageUrl: string }> => {
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const response = await axiosInstance.post<{ imageUrl: string }>(
+            "/products/upload",
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+
+        return response.data;
     }
 };

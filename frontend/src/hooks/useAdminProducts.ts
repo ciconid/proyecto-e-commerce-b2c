@@ -68,12 +68,34 @@ export const useAdminProducts = () => {
         },
     });
 
+    // Mutation para subir imagen
+    const uploadImageMutation = useMutation({
+        mutationFn: (file: File) => productsApi.uploadImage(file),
+        onSuccess: () => {
+            notifications.show({
+                title: 'Imagen subida',
+                message: 'La imagen se subió exitosamente',
+                color: 'green',
+            });
+        },
+        onError: () => {
+            notifications.show({
+                title: 'Error',
+                message: 'No se pudo subir la imagen',
+                color: 'red',
+            });
+        },
+    });
+
     return {
         createProduct: createMutation.mutate,
         updateProduct: updateMutation.mutate,
         deleteProduct: deleteMutation.mutate,
+        uploadImage: uploadImageMutation.mutateAsync,
         isCreating: createMutation.isPending,
         isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
+        isUploading: uploadImageMutation.isPending,
+
     };
 };
