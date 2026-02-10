@@ -11,6 +11,7 @@ services:
       - "5433:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./init-db.sh:/docker-entrypoint-initdb.d/init-db.sh
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres"]
       interval: 10s
@@ -35,18 +36,18 @@ services:
         condition: service_healthy
     command: sh -c "npx prisma migrate deploy && npm run start:prod"
 
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-    container_name: ecommerce-frontend
-    restart: always
-    ports:
-      - "5173:80" 
-    depends_on:
-      - backend
-    environment:
-      - VITE_API_URL=http://localhost:3000/api/
+  # frontend:
+  #   build:
+  #     context: ./frontend
+  #     dockerfile: Dockerfile
+  #   container_name: ecommerce-frontend
+  #   restart: always
+  #   ports:
+  #     - "5173:80" 
+  #   depends_on:
+  #     - backend
+  #   environment:
+  #     - VITE_API_URL=http://localhost:3000/api/
   
 volumes:
   postgres_data:
