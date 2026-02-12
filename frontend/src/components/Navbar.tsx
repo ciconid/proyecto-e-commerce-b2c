@@ -1,4 +1,4 @@
-import { ActionIcon, Anchor, Badge, Box, Container, Group, Menu, Text } from "@mantine/core";
+import { Anchor, Badge, Box, Container, Group, Menu, Text } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
 import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react"
 import { useAuthStore } from "../store/authStore";
