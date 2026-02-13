@@ -5,12 +5,14 @@ import { RegisterDto } from './dto/register.dto';
 import * as bcrypt from 'bcrypt';
 import { LoginDto } from './dto/login.dto';
 import { RefreshTokenDto } from './dto/refresh-token.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
     constructor(
         private prisma: PrismaService,
-        private jwtService: JwtService
+        private jwtService: JwtService,
+        private configService: ConfigService
     ) { }
 
 
@@ -87,7 +89,9 @@ export class AuthService {
     async refresh(refreshTokenDto: RefreshTokenDto) {
         try {
             // Verificar que el token sea válido
-            const payload = this.jwtService.verify(refreshTokenDto.refresh_token);
+            const payload = this.jwtService.verify(refreshTokenDto.refresh_token, {
+                secret: this.configService.get("JWT_REFRESH_SECRET")
+            });
 
             // Buscar usuario
             const user = await this.prisma.user.findUnique({
@@ -119,12 +123,18 @@ export class AuthService {
 
     private generateAccessToken(user: { id: string, email: string, role: string }) {
         const payload = { sub: user.id, email: user.email, role: user.role };
-        return this.jwtService.sign(payload, { expiresIn: '15m' });
+        return this.jwtService.sign(payload, { 
+            secret: this.configService.get("JWT_SECRET"),
+            expiresIn: '15m' 
+        });
     }
 
     private generateRefreshToken(user: { id: string, email: string, role: string }) {
         const payload = { sub: user.id, email: user.email, role: user.role };
-        return this.jwtService.sign(payload, { expiresIn: '7d' });
+        return this.jwtService.sign(payload, {
+            secret: this.configService.get("JWT_REFRESH_SECRET"),
+            expiresIn: '7d'
+        });
     }
 
     private async hashRefreshToken(token: string) {

@@ -1,4 +1,5 @@
 import axios from 'axios';
+import { useAuthStore } from '../store/authStore';
 
 const axiosInstance = axios.create({
     baseURL: import.meta.env.VITE_API_URL,
@@ -42,9 +43,10 @@ axiosInstance.interceptors.response.use(
     (response) => response,
     async (error) => {
         const originalRequest = error.config;
-        if (error.response?.status === 401 && !originalRequest._retry) {
 
+        if (error.response?.status === 401 && !originalRequest._retry) {
             const refreshToken = localStorage.getItem("refresh_token");
+
             if (!refreshToken) {
                 return Promise.reject(error);
             }
@@ -71,7 +73,7 @@ axiosInstance.interceptors.response.use(
                 }
 
                 const response = await axios.post(
-                    `${axiosInstance.defaults.baseURL}/auth/refresh`,
+                    `${axiosInstance.defaults.baseURL}auth/refresh`,
                     { refresh_token: refreshToken }
                 );
 
@@ -88,14 +90,24 @@ axiosInstance.interceptors.response.use(
             } catch (error) {
                 processQueue(error as Error, null);
 
-                const hadSession = !!localStorage.getItem("refresh_token");
+                //const hadSession = !!localStorage.getItem("refresh_token");
+                useAuthStore.getState().clearAuth();
 
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
+                localStorage.removeItem("user");
 
-                if (hadSession){
+                // solo redirigo a /login si esta en una ruta protegida
+                const publicRoutes = ["/products", "/login", "/register"];
+                const isPublicRoute = publicRoutes.includes(window.location.pathname);
+
+                if (!isPublicRoute) {
                     window.location.href = "/login";
                 }
+
+                // if (hadSession){
+                //     window.location.href = "/login";
+                // }
                 
                 return Promise.reject(error);
 
