@@ -38,7 +38,7 @@ function Navbar() {
                             Productos
                         </Anchor>
 
-                        {user && (
+                        {user && user.role !== "admin" && (
                             <>
                                 <Anchor component={Link} to={"/cart"} style={{ position: "relative" }}>
                                     Carrito
@@ -61,15 +61,14 @@ function Navbar() {
                                 <Anchor component={Link} to={"/orders"}>
                                     Mis Órdenes
                                 </Anchor>
-
-                                {user?.role === "admin" &&
-                                    <Anchor component={Link} to={"/admin"}>
-                                        Admin Panel
-                                    </Anchor>
-                                }
-
                             </>
                         )}
+
+                        {user && user.role === "admin" &&
+                            <Anchor component={Link} to={"/admin"}>
+                                Admin Panel
+                            </Anchor>
+                        }
 
                         {user ? (
                             <Menu shadow="md" width={200}>
