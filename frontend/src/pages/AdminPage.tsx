@@ -1,4 +1,4 @@
-import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select } from '@mantine/core';
+import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select, Text } from '@mantine/core';
 import { useProducts } from '../hooks/useProducts';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useState } from 'react';
@@ -177,9 +177,19 @@ function AdminPage() {
                             <Table.Tbody>
                                 {allOrders?.map((order) => (
                                     <Table.Tr key={order.id}>
-                                        <Table.Td>{order.id.substring(0, 8)}...</Table.Td>
-                                        <Table.Td>{order.userId.substring(0, 8)}...</Table.Td>
+                                        <Table.Td>
+                                            <Text size="sm" title={order.id} style={{ cursor: "default", fontFamily: "monospace" }}>
+                                                {order.id}
+                                            </Text>
+                                        </Table.Td>
+
+                                        <Table.Td>
+                                            <Text size="sm" fw={500}>{order.user.name}</Text>
+                                            <Text size="xs" c="dimmed">{order.user.email}</Text>
+                                        </Table.Td>
+
                                         <Table.Td>${order.total}</Table.Td>
+
                                         <Table.Td>
                                             <Select
                                                 value={order.status}
@@ -190,9 +200,13 @@ function AdminPage() {
                                                     { value: 'cancelada', label: 'Cancelada' },
                                                 ]}
                                                 size="xs"
+                                                w={130}
+                                                styles={{ input: { minWidth: 0 } }}
                                             />
                                         </Table.Td>
+
                                         <Table.Td>{new Date(order.createdAt).toLocaleDateString()}</Table.Td>
+
                                         <Table.Td>
                                             <Button size="xs" variant="light">Ver Detalle</Button>
                                         </Table.Td>
