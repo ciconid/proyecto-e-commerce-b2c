@@ -43,6 +43,11 @@ axiosInstance.interceptors.response.use(
     async (error) => {
         const originalRequest = error.config;
         if (error.response?.status === 401 && !originalRequest._retry) {
+
+            const refreshToken = localStorage.getItem("refresh_token");
+            if (!refreshToken) {
+                return Promise.reject(error);
+            }
             
             if (isRefreshing) {
                 return new Promise((resolve, reject) => {
@@ -83,11 +88,15 @@ axiosInstance.interceptors.response.use(
             } catch (error) {
                 processQueue(error as Error, null);
 
+                const hadSession = !!localStorage.getItem("refresh_token");
+
                 localStorage.removeItem("access_token");
                 localStorage.removeItem("refresh_token");
 
-                window.location.href = "/login";
-
+                if (hadSession){
+                    window.location.href = "/login";
+                }
+                
                 return Promise.reject(error);
 
             } finally {

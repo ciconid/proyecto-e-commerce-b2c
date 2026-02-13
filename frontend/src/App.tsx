@@ -19,13 +19,9 @@ function App() {
                     {/* Rutas publicas */}
                     <Route path="/login" element={<LoginPage />} />
                     <Route path="/register" element={<RegisterPage />} />
+                    <Route path="/products" element={<ProductsPage />} />
 
                     {/* Rutas protegidas */}
-                    <Route path="/products" element={
-                        <PrivateRoute>
-                            <ProductsPage />
-                        </PrivateRoute>
-                    } />
                     <Route path="/cart" element={
                         <PrivateRoute>
                             <CartPage />
