@@ -19,17 +19,18 @@ function Navbar() {
 
     return (
         <Box
-            p={"md"}
+            px={"md"}
             style={{
                 borderBottom: "1px solid #dee2e6",
                 position: "sticky",
                 top: 0,
                 backgroundColor: "white",
-                zIndex: 100
+                zIndex: 100,
+                height: "12vh"
             }}
         >
-            <Container size={"xl"}>
-                <Group justify="space-between">
+            <Container size={"xl"} h={"100%"}>
+                <Group justify="space-between" align="flex-end" h={"100%"} pb={"xs"}>
                     <Text size="xl" fw={700} c={"blue"}>Mi tienda</Text>
 
                     <Group>

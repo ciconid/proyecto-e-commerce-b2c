@@ -24,7 +24,11 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
     <React.StrictMode>
         <QueryClientProvider client={queryClient}>
             <MantineProvider >
-                <Notifications position="top-right" />
+                <Notifications
+                    position="top-right" 
+                    autoClose={1500}
+                    style={{ width:350 }}
+                />
                 <App />
                 <ReactQueryDevtools initialIsOpen={false} />
             </MantineProvider>
