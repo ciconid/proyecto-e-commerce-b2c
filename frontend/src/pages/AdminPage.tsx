@@ -1,5 +1,4 @@
 import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select, Text, Divider, Image } from '@mantine/core';
-import { useProducts } from '../hooks/useProducts';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useState } from 'react';
 import type z from 'zod';
@@ -16,7 +15,6 @@ type CreateProductForm = z.infer<typeof createProductSchema>;
 
 function AdminPage() {
     const {
-        deleteProduct,
         createProduct,
         isCreating,
         updateProduct,
