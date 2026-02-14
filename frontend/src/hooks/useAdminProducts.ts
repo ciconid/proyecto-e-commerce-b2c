@@ -1,4 +1,4 @@
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient, useQuery } from '@tanstack/react-query';
 import { productsApi } from '../api/products.api';
 import { notifications } from '@mantine/notifications';
 import type { CreateProductRequest, UpdateProductRequest } from '../types/product.types';
@@ -6,6 +6,12 @@ import type { CreateProductRequest, UpdateProductRequest } from '../types/produc
 
 export const useAdminProducts = () => {
     const queryClient = useQueryClient();
+
+     // Query para todos los productos incluyendo inactivos
+    const adminProductsQuery = useQuery({
+        queryKey: ["products", "admin"],
+        queryFn: productsApi.getAllAdmin,
+    });
 
     // Mutation para crear producto
     const createMutation = useMutation({
@@ -87,15 +93,38 @@ export const useAdminProducts = () => {
         },
     });
 
+    // Mutation para activar/desactivar producto
+    const toggleActiveMutation = useMutation({
+        mutationFn: (id: string) => productsApi.toggleActive(id),
+        onSuccess: (product) => {
+            queryClient.invalidateQueries({ queryKey: ["products"] });
+            notifications.show({
+                title: product.active ? "Producto activado" : "Producto desactivado",
+                message: product.active ? "El producto está visible para los usuarios" : "El producto está oculto para los usuarios",
+                color: product.active ? "green" : "orange",
+            });
+        },
+        onError: () => {
+            notifications.show({
+                title: "Error",
+                message: "No se pudo cambiar el estado del producto",
+                color: "red",
+            });
+        },
+    });
+
     return {
+        adminProducts: adminProductsQuery.data,
+        isLoadingAdmin: adminProductsQuery.isLoading, 
         createProduct: createMutation.mutate,
         updateProduct: updateMutation.mutate,
         deleteProduct: deleteMutation.mutate,
         uploadImage: uploadImageMutation.mutateAsync,
+        toggleActive: toggleActiveMutation.mutate,
         isCreating: createMutation.isPending,
         isUpdating: updateMutation.isPending,
         isDeleting: deleteMutation.isPending,
         isUploading: uploadImageMutation.isPending,
-
+        isTogglingActive: toggleActiveMutation.isPending,
     };
 };

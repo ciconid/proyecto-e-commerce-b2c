@@ -15,8 +15,19 @@ import type { Order } from '../types/order.types';
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
 function AdminPage() {
-    const { data: products, isLoading } = useProducts();
-    const { deleteProduct, createProduct, isCreating, updateProduct, isUpdating, uploadImage, isUploading } = useAdminProducts();
+    const {
+        deleteProduct,
+        createProduct,
+        isCreating,
+        updateProduct,
+        isUpdating,
+        uploadImage,
+        isUploading,
+        toggleActive,
+        isTogglingActive,
+        adminProducts: products,
+        isLoadingAdmin: isLoading
+    } = useAdminProducts();
 
     const { orders: allOrders, isLoading: ordersLoading } = useOrders();
     const { updateOrderStatus } = useAdminOrders();
@@ -97,6 +108,10 @@ function AdminPage() {
         });
     };
 
+    const sortedProducts = [...(products || []).sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    )];
+
     return (
         <Container fluid px="xl" py="xl">
             <Title mb="xl">Panel de Administración</Title>
@@ -131,7 +146,7 @@ function AdminPage() {
                                 </Table.Tr>
                             </Table.Thead>
                             <Table.Tbody>
-                                {products?.map((product) => (
+                                {sortedProducts.map((product) => (
                                     <Table.Tr key={product.id}>
                                         <Table.Td>{product.name}</Table.Td>
                                         <Table.Td>${product.price}</Table.Td>
@@ -147,11 +162,12 @@ function AdminPage() {
                                                 </Button>
                                                 <Button
                                                     size="xs"
-                                                    color="red"
+                                                    color={product.active ? "orange" : "green"}   
                                                     variant="light"
-                                                    onClick={() => deleteProduct(product.id)}
+                                                    loading={isTogglingActive}
+                                                    onClick={() => toggleActive(product.id)}
                                                 >
-                                                    Eliminar
+                                                    {product.active ? "Desactivar" : "Activar"}   
                                                 </Button>
                                             </Group>
                                         </Table.Td>

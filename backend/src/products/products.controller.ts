@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UploadedFile, UseInterceptors, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UploadedFile, UseInterceptors, BadRequestException, Request } from '@nestjs/common';
 import { ProductsService } from './products.service';
 import { CreateProductDto } from './dto/create-product.dto';
 import { UpdateProductDto } from './dto/update-product.dto';
@@ -35,6 +35,16 @@ export class ProductsController {
     @ApiResponse({ status: 200, description: 'Lista de productos' })
     findAll() {
         return this.productsService.findAll();
+    }
+
+    @Get("all")
+    @Roles("admin")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Obtener todos los productos incluyendo inactivos" })
+    @ApiResponse({ status: 200, description: "Lista completa de productos" })
+    findAllAdmin() {
+        return this.productsService.findAllAdmin();
     }
 
     @Get(':id')
@@ -117,6 +127,17 @@ export class ProductsController {
         return imageUrl;
     }
 
-
+    @Patch(":id/toggle-active")
+    @Roles("admin")
+    @UseGuards(JwtAuthGuard, RolesGuard)
+    @ApiBearerAuth()
+    @ApiOperation({ summary: "Activar o desactivar un producto" })
+    @ApiParam({ name: "id", description: "UUID del producto" })
+    @ApiResponse({ status: 200, description: "Estado del producto actualizado" })
+    @ApiResponse({ status: 401, description: "No autorizado" })
+    @ApiResponse({ status: 403, description: "Acceso prohibido - solo admin" })
+    toggleActive(@Param("id") id: string) {
+        return this.productsService.toggleActive(id);
+    }
 
 }

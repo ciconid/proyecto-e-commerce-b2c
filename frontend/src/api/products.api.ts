@@ -8,6 +8,11 @@ export const productsApi = {
         return response.data;
     },
 
+    getAllAdmin: async (): Promise<Product[]> => {
+        const response = await axiosInstance.get<Product[]>("/products/all");
+        return response.data;
+    },
+
     create: async (data: CreateProductRequest): Promise<Product> => {
         const response = await axiosInstance.post<Product>("/products", data);
         return response.data;
@@ -37,5 +42,10 @@ export const productsApi = {
         );
 
         return response.data;
-    }
+    },
+
+    toggleActive: async (id: string): Promise<Product> => {
+        const response = await axiosInstance.patch<Product>(`/products/${id}/toggle-active`);
+        return response.data;
+    },
 };

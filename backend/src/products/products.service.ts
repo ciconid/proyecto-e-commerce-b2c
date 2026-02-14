@@ -5,34 +5,47 @@ import { PrismaService } from 'src/prisma/prisma.service';
 
 @Injectable()
 export class ProductsService {
-  constructor(private prisma: PrismaService){}
+    constructor(private prisma: PrismaService) { }
 
-  create(createProductDto: CreateProductDto) {
-    return this.prisma.product.create({
-      data: createProductDto
-    });
-  }
+    create(createProductDto: CreateProductDto) {
+        return this.prisma.product.create({
+            data: createProductDto
+        });
+    }
 
-  findAll() {
-    return this.prisma.product.findMany();
-  }
+    findAll() {
+        return this.prisma.product.findMany({
+            where: { active: true }
+        });
+    }
 
-  findOne(id: string) {
-    return this.prisma.product.findUnique({
-      where: { id }
-    });
-  }
+    findAllAdmin() {
+        return this.prisma.product.findMany();
+    }
 
-  update(id: string, updateProductDto: UpdateProductDto) {
-    return this.prisma.product.update({
-      where: { id },
-      data: updateProductDto
-    });
-  }
+    findOne(id: string) {
+        return this.prisma.product.findUnique({
+            where: { id }
+        });
+    }
 
-  remove(id: string) {
-    return this.prisma.product.delete({
-      where: { id }
-    });
-  }
+    update(id: string, updateProductDto: UpdateProductDto) {
+        return this.prisma.product.update({
+            where: { id },
+            data: updateProductDto
+        });
+    }
+
+    remove(id: string) {
+        return this.prisma.product.delete({
+            where: { id }
+        });
+    }
+
+    async toggleActive(id: string) {
+        const product = await this.findOne(id);
+        const updated = await this.update(id, { active: !product?.active });
+
+        return updated;
+    }
 }
