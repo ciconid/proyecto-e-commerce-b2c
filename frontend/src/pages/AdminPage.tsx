@@ -1,4 +1,4 @@
-import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select, Text } from '@mantine/core';
+import { Container, Title, Tabs, Table, Group, Button, Loader, Modal, Stack, TextInput, NumberInput, Textarea, Select, Text, Divider, Image } from '@mantine/core';
 import { useProducts } from '../hooks/useProducts';
 import { useAdminProducts } from '../hooks/useAdminProducts';
 import { useState } from 'react';
@@ -10,6 +10,7 @@ import type { Product } from '../types/product.types';
 import { useOrders } from '../hooks/useOrders';
 import { useAdminOrders } from '../hooks/useAdminOrders';
 import { ImageUpload } from '../components/ImageUpload';
+import type { Order } from '../types/order.types';
 
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
@@ -23,6 +24,9 @@ function AdminPage() {
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<Product | null>(null);
+
+    const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
     const { register, handleSubmit, formState: { errors }, reset, control } = useForm<CreateProductForm>({
         resolver: zodResolver(createProductSchema),
@@ -208,7 +212,16 @@ function AdminPage() {
                                         <Table.Td>{new Date(order.createdAt).toLocaleDateString()}</Table.Td>
 
                                         <Table.Td>
-                                            <Button size="xs" variant="light">Ver Detalle</Button>
+                                            <Button
+                                                size="xs"
+                                                variant="light"
+                                                onClick={() => {
+                                                    setSelectedOrder(order);
+                                                    setIsOrderDetailOpen(true);
+                                                }}
+                                            >
+                                                Ver Detalle
+                                            </Button>
                                         </Table.Td>
                                     </Table.Tr>
                                 ))}
@@ -371,6 +384,73 @@ function AdminPage() {
                 </form>
             </Modal>
 
+            {/* Modal Ver Detalles de Orden */}
+            <Modal
+                opened={isOrderDetailOpen}
+                onClose={() => {
+                    setIsOrderDetailOpen(false);
+                    setSelectedOrder(null);
+                }}
+                title={`Detalle de Orden`}
+                size="lg"
+                centered
+                styles={modalStyles}
+            >
+                {selectedOrder && (
+                    <Stack>
+                        {/* Datos de la orden */}
+                        <div>
+                            <Text fw={700} mb="xs">Información de la Orden</Text>
+                            <Text size="sm"><b>ID:</b> {selectedOrder.id}</Text>
+                            <Text size="sm"><b>Fecha:</b> {new Date(selectedOrder.createdAt).toLocaleString()}</Text>
+                            <Text size="sm"><b>Estado:</b> {selectedOrder.status}</Text>
+                            <Text size="sm"><b>Total:</b> ${selectedOrder.total}</Text>
+                        </div>
+
+                        <Divider />
+
+                        {/* Datos del usuario */}
+                        <div>
+                            <Text fw={700} mb="xs">Cliente</Text>
+                            <Text size="sm"><b>Nombre:</b> {selectedOrder.user.name}</Text>
+                            <Text size="sm"><b>Email:</b> {selectedOrder.user.email}</Text>
+                        </div>
+
+                        <Divider />
+
+                        {/* Items */}
+                        <div>
+                            <Text fw={700} mb="xs">Productos</Text>
+                            <Stack gap="sm">
+                                {selectedOrder.items.map((item) => (
+                                    <Group key={item.id} align="center" justify="space-between">
+                                        <Group>
+                                            <Image
+                                                src={item.product.imageUrl || "https://www.nomadfoods.com/wp-content/uploads/2018/08/placeholder-1-e1533569576673.png"}
+                                                width={50}
+                                                height={50}
+                                                fit="cover"
+                                                radius="sm"
+                                            />
+                                            <div>
+                                                <Text size="sm" fw={500}>{item.product.name}</Text>
+                                                <Text size="xs" c="dimmed">${item.price} x {item.quantity}</Text>
+                                            </div>
+                                        </Group>
+                                        <Text size="sm" fw={700}>${item.price * item.quantity}</Text>
+                                    </Group>
+                                ))}
+                            </Stack>
+                        </div>
+
+                        <Divider />
+
+                        <Group justify="flex-end">
+                            <Text fw={700}>Total: ${selectedOrder.total}</Text>
+                        </Group>
+                    </Stack>
+                )}
+            </Modal>
         </Container>
     );
 }
