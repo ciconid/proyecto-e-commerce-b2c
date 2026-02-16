@@ -106,7 +106,7 @@ function CartPage() {
                 <Card withBorder padding="lg" mt="md">
                     <Group justify="space-between">
                         <Text size="xl" fw={700}>Total:</Text>
-                        <Text size="xl" fw={700}>${total}</Text>
+                        <Text size="xl" fw={700}>{formatPrice(total)}</Text>
                     </Group>
 
                     <Button
