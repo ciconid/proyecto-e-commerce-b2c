@@ -7,6 +7,7 @@ import { loginSchema } from "../utils/validations";
 import { authApi } from "../api/auth.api";
 import { notifications } from "@mantine/notifications";
 import { z } from "zod";
+import { useQueryClient } from "@tanstack/react-query";
 
 type LoginFormData = z.infer<typeof loginSchema>;
 
@@ -18,10 +19,13 @@ function LoginPage() {
         resolver: zodResolver(loginSchema),
     });
 
+    const queryClient = useQueryClient();
+
     const onSubmit = async (data: LoginFormData) => {
         try {
             const response = await authApi.login(data);
             setAuth(response.user, response.access_token, response.refresh_token);
+            queryClient.clear();
 
             notifications.show({
                 message: `Bienvenido ${response.user.name}`,

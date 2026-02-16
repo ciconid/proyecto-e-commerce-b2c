@@ -3,6 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { IconChevronDown, IconLogout, IconUser, IconShoppingCart } from "@tabler/icons-react"
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
+import { useQueryClient } from "@tanstack/react-query";
 
 
 function Navbar() {
@@ -11,8 +12,11 @@ function Navbar() {
     const totalItems = useCartStore((state) => state.getTotalItems());
     const user = useAuthStore((state) => state.user);
 
+    const queryClient = useQueryClient();
+
     const handleLogout = () => {
         clearAuth();
+        queryClient.clear();
         navigate("/products");
     };
 
