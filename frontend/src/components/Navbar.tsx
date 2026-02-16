@@ -1,6 +1,6 @@
 import { Anchor, Badge, Box, Container, Group, Menu, Text } from "@mantine/core";
 import { Link, useNavigate } from "react-router-dom";
-import { IconChevronDown, IconLogout, IconUser } from "@tabler/icons-react"
+import { IconChevronDown, IconLogout, IconUser, IconShoppingCart } from "@tabler/icons-react"
 import { useAuthStore } from "../store/authStore";
 import { useCartStore } from "../store/cartStore";
 
@@ -13,7 +13,7 @@ function Navbar() {
 
     const handleLogout = () => {
         clearAuth();
-        navigate("/login");
+        navigate("/products");
     };
 
 
@@ -38,10 +38,21 @@ function Navbar() {
                             Productos
                         </Anchor>
 
-                        {user && user.role !== "admin" && (
-                            <>
-                                <Anchor component={Link} to={"/cart"} style={{ position: "relative" }}>
-                                    Carrito
+                        {user && (
+                            <Anchor component={Link} to={"/orders"}>
+                                Mis Órdenes
+                            </Anchor>
+                        )}
+
+                        {user && user.role === "admin" &&
+                            <Anchor component={Link} to={"/admin"}>
+                                Admin Panel
+                            </Anchor>
+                        }
+
+                        {user && (
+                            <Anchor component={Link} to={"/cart"} style={{ position: "relative" }}>
+                                    <IconShoppingCart size={22}/>
                                     {totalItems > 0 &&
                                         <Badge
                                             size="md"
@@ -57,18 +68,7 @@ function Navbar() {
                                         </Badge>
                                     }
                                 </Anchor>
-
-                                <Anchor component={Link} to={"/orders"}>
-                                    Mis Órdenes
-                                </Anchor>
-                            </>
                         )}
-
-                        {user && user.role === "admin" &&
-                            <Anchor component={Link} to={"/admin"}>
-                                Admin Panel
-                            </Anchor>
-                        }
 
                         {user ? (
                             <Menu shadow="md" width={200}>

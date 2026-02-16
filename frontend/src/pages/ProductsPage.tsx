@@ -1,6 +1,7 @@
-import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader } from "@mantine/core";
+import { Card, Container, Grid, Title, Image, Button, Text, SimpleGrid, Center, Loader, Box } from "@mantine/core";
 import { useProducts } from "../hooks/useProducts";
 import { useCart } from "../hooks/useCart";
+import { formatPrice } from "../utils/formatPrice";
 
 
 function ProductsPage() {
@@ -56,18 +57,23 @@ function ProductsPage() {
 
                                 <Title order={3} mt={"md"}>{product.name}</Title>
                                 <Text size="sm" c={"dimmed"}>{product.description}</Text>
-                                <Text size="xl" fw={700} mt={"md"}>${product.price}</Text>
-                                <Text size="sm">Stock: {product.stock}</Text>
+                                
+                                <Box mt="auto">
+                                    <Text size="xl" fw={700} mt={"md"}>{formatPrice(product.price)}</Text>
+                                    <Text size="sm">Stock: {product.stock}</Text>
 
-                                <Button
-                                    fullWidth
-                                    mt="auto"
-                                    onClick={() => handleAddToCart(product.id)}
-                                    disabled={product.stock === 0}
-                                >
-                                    {product.stock === 0 ? "Sin stock" : "Agregar al carrito"}
-                                </Button>
+                                    <Button
+                                        fullWidth
+                                        mt="auto"
+                                        onClick={() => handleAddToCart(product.id)}
+                                        disabled={product.stock === 0}
+                                    >
+                                        {product.stock === 0 ? "Sin stock" : "Agregar al carrito"}
+                                    </Button>
+                                </Box>
                             </Card>
+
+                            
                         ))
                     }
                 </SimpleGrid>

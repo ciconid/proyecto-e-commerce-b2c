@@ -10,6 +10,7 @@ import { useOrders } from '../hooks/useOrders';
 import { useAdminOrders } from '../hooks/useAdminOrders';
 import { ImageUpload } from '../components/ImageUpload';
 import type { Order } from '../types/order.types';
+import { formatPrice } from '../utils/formatPrice';
 
 type CreateProductForm = z.infer<typeof createProductSchema>;
 
@@ -147,7 +148,7 @@ function AdminPage() {
                                 {sortedProducts.map((product) => (
                                     <Table.Tr key={product.id}>
                                         <Table.Td>{product.name}</Table.Td>
-                                        <Table.Td>${product.price}</Table.Td>
+                                        <Table.Td>{formatPrice(product.price)}</Table.Td>
                                         <Table.Td>{product.stock}</Table.Td>
                                         <Table.Td>
                                             <Group gap="xs">
@@ -206,7 +207,7 @@ function AdminPage() {
                                             <Text size="xs" c="dimmed">{order.user.email}</Text>
                                         </Table.Td>
 
-                                        <Table.Td>${order.total}</Table.Td>
+                                        <Table.Td>{formatPrice(order.total)}</Table.Td>
 
                                         <Table.Td>
                                             <Select
@@ -418,7 +419,7 @@ function AdminPage() {
                             <Text size="sm"><b>ID:</b> {selectedOrder.id}</Text>
                             <Text size="sm"><b>Fecha:</b> {new Date(selectedOrder.createdAt).toLocaleString()}</Text>
                             <Text size="sm"><b>Estado:</b> {selectedOrder.status}</Text>
-                            <Text size="sm"><b>Total:</b> ${selectedOrder.total}</Text>
+                            <Text size="sm"><b>Total:</b> {formatPrice(selectedOrder.total)}</Text>
                         </div>
 
                         <Divider />
@@ -448,10 +449,10 @@ function AdminPage() {
                                             />
                                             <div>
                                                 <Text size="sm" fw={500}>{item.product.name}</Text>
-                                                <Text size="xs" c="dimmed">${item.price} x {item.quantity}</Text>
+                                                <Text size="xs" c="dimmed">{formatPrice(item.price)} x {item.quantity}</Text>
                                             </div>
                                         </Group>
-                                        <Text size="sm" fw={700}>${item.price * item.quantity}</Text>
+                                        <Text size="sm" fw={700}>{formatPrice(item.price * item.quantity)}</Text>
                                     </Group>
                                 ))}
                             </Stack>
@@ -460,7 +461,7 @@ function AdminPage() {
                         <Divider />
 
                         <Group justify="flex-end">
-                            <Text fw={700}>Total: ${selectedOrder.total}</Text>
+                            <Text fw={700}>Total: {formatPrice(selectedOrder.total)}</Text>
                         </Group>
                     </Stack>
                 )}

@@ -2,6 +2,7 @@ import { Box, Button, Card, Center, Container, Group, Image, Loader, Text, Title
 import { useCart } from "../hooks/useCart";
 import { Link } from "react-router-dom";
 import { useOrders } from "../hooks/useOrders";
+import { formatPrice } from "../utils/formatPrice";
 
 function CartPage() {
     const { cart, isLoading, error, updateItem, removeItem } = useCart();
@@ -61,7 +62,7 @@ function CartPage() {
 
                             <div>
                                 <Text fw={500}>{item.product.name}</Text>
-                                <Text size="sm" c="dimmed">${item.product.price}</Text>
+                                <Text size="sm" c="dimmed">{formatPrice(item.product.price)}</Text>
                             </div>
 
                             <Group>
@@ -87,7 +88,7 @@ function CartPage() {
                                 </Button>
                             </Group>
 
-                            <Text fw={700}>${item.product.price * item.quantity}</Text>
+                            <Text fw={700}>{formatPrice(item.product.price * item.quantity)}</Text>
 
                             <Button
                                 color="red"
