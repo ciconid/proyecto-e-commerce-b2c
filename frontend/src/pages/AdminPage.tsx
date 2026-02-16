@@ -86,16 +86,9 @@ function AdminPage() {
 
     const modalStyles = {
         inner: {
-            justifyContent: 'flex-start',
-        },
-        content: {
-            margin: -300,
-            width: '50vw',
-            maxWidth: '50vw',
-            height: '100vh',
-            borderRadius: 0,
-        },
-    };
+            left: 0
+        } as React.CSSProperties
+    }
 
     const resetModal = () => {
         reset({
