@@ -17,6 +17,8 @@ export const useOrders = () => {
         onSuccess: (order) => {
             queryClient.invalidateQueries({ queryKey: ['orders'] });
             queryClient.invalidateQueries({ queryKey: ['cart'] });
+            queryClient.invalidateQueries({ queryKey: ['products'] });
+
 
             notifications.show({
                 title: 'Orden creada',

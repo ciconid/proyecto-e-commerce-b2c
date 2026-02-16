@@ -9,7 +9,7 @@ export class OrdersService {
     constructor(
         private prisma: PrismaService,
         private cartService: CartService
-    ) {}
+    ) { }
 
 
     // Crear orden desde el carrito
@@ -30,37 +30,59 @@ export class OrdersService {
             throw new BadRequestException('El carrito esta vacio');
         }
 
+        for (const item of cart.items) {
+            if (item.product.stock < item.quantity) {
+                throw new BadRequestException(
+                    `Stock insuficiente para "${item.product.name}". ` +
+                    `Disponible: ${item.product.stock}, solicitado: ${item.quantity}.`
+                );
+            }
+        }
+
         // Calcular total
         const total = cart.items.reduce((sum, item) => {
             return sum + item.product.price * item.quantity;
         }, 0);
 
-        // Crear orden con items
-        const order = await this.prisma.order.create({
-            data: {
-                userId,
-                total,
-                status: 'pendiente',
-                items: {
-                    create: cart.items.map((item) => ({
-                        productId: item.productId,
-                        quantity: item.quantity,
-                        price: item.product.price
-                    }))
-                }
-            },
-            include: {
-                items: {
-                    include: {
-                        product: true
+        // Crear orden con items, descontar stock y vaciar carrito (transacción atómica)
+        const order = await this.prisma.$transaction(async (tx) => {
+            const newOrder = await tx.order.create({
+                data: {
+                    userId,
+                    total,
+                    status: 'pendiente',
+                    items: {
+                        create: cart.items.map((item) => ({
+                            productId: item.productId,
+                            quantity: item.quantity,
+                            price: item.product.price
+                        }))
+                    }
+                },
+                include: {
+                    items: {
+                        include: {
+                            product: true
+                        }
                     }
                 }
+            });
+
+            // Descontar stock de cada producto
+            for (const item of cart.items) {
+                await tx.product.update({
+                    where: { id: item.productId },
+                    data: {
+                        stock: { decrement: item.quantity }
+                    }
+                });
             }
+
+            // Vaciar carrito 
+            await this.cartService.clearCart(userId);  // ⚠️ ver nota abajo
+
+            return newOrder;
         });
-
-        // Vaciar carrito
-        await this.cartService.clearCart(userId);
-
 
         return order;
     }
@@ -117,7 +139,7 @@ export class OrdersService {
             throw new NotFoundException('Orden no encontrada');
         }
 
-        if (!isAdmin && order.userId !== userId ) {
+        if (!isAdmin && order.userId !== userId) {
             throw new NotFoundException('Orden no encontrada');
         }
 
