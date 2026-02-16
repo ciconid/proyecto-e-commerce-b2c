@@ -7,6 +7,10 @@ function ProductsPage() {
     const { data: products, error, isLoading } = useProducts();
     const { addItem } = useCart();
 
+    const sortedProducts = [...(products ?? [])].sort((a, b) => 
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
     const handleAddToCart = (productId: string) => {
         addItem({ productId, quantity: 1 });
     };
@@ -37,7 +41,7 @@ function ProductsPage() {
             <Grid>
                 <SimpleGrid cols={{ base: 1, sm: 2, md: 3, lg: 4 }} spacing={"md"}>
                     {
-                        products?.map((product) => (
+                        sortedProducts?.map((product) => (
                             <Card
                                 withBorder
                                 key={product.id}

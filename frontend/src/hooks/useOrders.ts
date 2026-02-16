@@ -28,11 +28,12 @@ export const useOrders = () => {
 
             navigate('/orders');
         },
-        onError: () => {
+        onError: (error: any) => {
             notifications.show({
                 title: 'Error',
-                message: 'No se pudo crear la orden',
+                message: error.response?.data?.message || "No se pudo crear la orden",
                 color: 'red',
+                autoClose: 4000
             });
         },
     });

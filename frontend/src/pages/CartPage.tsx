@@ -44,13 +44,17 @@ function CartPage() {
         0
     );
 
+    const sortedItems = [...(cart.items ?? [])].sort((a, b) => 
+        new Date(a.product.createdAt).getTime() - new Date(b.product.createdAt).getTime()
+    );
+
 
     return (
         <Box style={{ width: "100vw", height: "100vh" }}>
             <Container px={"xl"} size={"md"}>
                 <Title>Mi carrito</Title>
 
-                {cart.items.map((item) => (
+                {sortedItems.map((item) => (
                     <Card withBorder padding="lg" key={item.id}>
                         <Group justify="space-between" mb="md">
                             <Image src={item.product.imageUrl} width={80} height={200} />
